@@ -1,21 +1,23 @@
 import pandas as pd
 import hopsworks
 from datetime import datetime
+import os
 
-# Load the data
+# 🔹 Authenticate with Hopsworks using your API key from environment
+api_key = os.getenv("HOPSWORKS_API_KEY")
+project = hopsworks.login(api_key_value=api_key)
+fs = project.get_feature_store()  # ✅ Only one call now
+
+# 🔹 Load the latest pollution data
 df = pd.read_csv("data/pollution_data.csv")
 
-# Example preprocessing
+# 🔹 Preprocess / feature engineering
 df["timestamp"] = pd.to_datetime(df["timestamp"])
 df["pm_ratio"] = df["pm2_5"] / (df["pm10"] + 1e-5)  # Avoid division by zero
 
 print("✅ Data cleaned and processed.")
 
-# Connect to Hopsworks
-project = hopsworks.login()
-fs = project.get_feature_store()
-
-# Create or get the feature group
+# 🔹 Create or get the feature group
 pollution_fg = fs.get_or_create_feature_group(
     name="pollution_features",
     version=1,
@@ -24,6 +26,6 @@ pollution_fg = fs.get_or_create_feature_group(
     online_enabled=False
 )
 
-# Insert data
+# 🔹 Insert processed data into Hopsworks Feature Store
 pollution_fg.insert(df)
 print("✅ Data uploaded to Hopsworks Feature Store successfully!")
