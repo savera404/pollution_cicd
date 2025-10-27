@@ -6,8 +6,13 @@ import os
 # Get API key from environment
 api_key = os.getenv("HOPSWORKS_API_KEY")
 
-# ✅ Login to Hopsworks using the API key (no hostname)
-project = hopsworks.login(api_key_value=api_key, project="pollution_cicd")
+# ✅ Non-interactive login for CI/CD
+project = hopsworks.login(
+    project="pollution_cicd",
+    api_key_value=api_key,
+    host="https://c.app.hopsworks.ai"
+)
+
 fs = project.get_feature_store()
 
 # Load the data
@@ -31,4 +36,3 @@ pollution_fg = fs.get_or_create_feature_group(
 # Insert data
 pollution_fg.insert(df)
 print("✅ Data uploaded to Hopsworks Feature Store successfully!")
-
