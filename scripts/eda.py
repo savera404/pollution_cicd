@@ -6,17 +6,24 @@ import os
 # Get API key from environment
 api_key = os.getenv("HOPSWORKS_API_KEY")
 
-# ✅ Non-interactive login for CI/CD
+if not api_key:
+    raise ValueError("❌ HOPSWORKS_API_KEY not found in environment variables!")
+
+print("✅ API key loaded successfully")
+
+# ✅ Non-interactive login for CI/CD - Fix the URL (remove duplicate https://)
 project = hopsworks.login(
     project="pollution_cicd",
     api_key_value=api_key,
-    host="https://c.app.hopsworks.ai"
+    host="c.app.hopsworks.ai"  # Fixed: removed https:// prefix
 )
 
 fs = project.get_feature_store()
 
 # Load the data
 df = pd.read_csv("data/pollution_data.csv")
+
+print(f"✅ Loaded {len(df)} rows from pollution_data.csv")
 
 # Example preprocessing
 df["timestamp"] = pd.to_datetime(df["timestamp"])
